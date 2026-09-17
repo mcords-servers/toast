@@ -16,10 +16,15 @@
 #define u32(x) (x)&0xFF, ((x)>>8)&0xFF, ((x)>>16)&0xFF, ((x)>>24)&0xFF
 
 typedef union reg {
-    uint64_t i;
+    uint64_t u64;
     uint32_t u32;
     uint16_t u16;
     uint8_t  u8;
+
+    int64_t  i64;
+    int32_t  i32;
+    int16_t  i16;
+    int8_t   i8;
 
     double   f;
     float    f32;
@@ -34,11 +39,23 @@ typedef struct env {
 enum byte_code: uint8_t {
     _noop,
     _add, _sub, _mul, _div, _mod,
+    _imul, _idiv, _imod,
     _and, _or, _xor, _not, _shL, _shR,
     _eq, _neq, _lt, _gt, _lte, _gte,
     _jmp, _jif, _jnif,
     _mov, _sys,
     _fetch, _store, _const,
+};
+enum reg_flags: uint64_t {
+    _CF = 1<<0,  // carry flag
+    _PF = 1<<1,  // parity flag
+    _AF = 1<<2,  // adjust flag (idk)    (won't be used likely)
+    _ZF = 1<<3,  // zero flag
+    _SF = 1<<4,  // sign flag
+    _TF = 1<<5,  // trap flag
+    _IF = 1<<6,  // interrupt flag
+    _DF = 1<<7,  // direction flag (idk) (won't be used likely)
+    _OF = 1<<8,  // overflow flag
 };
 enum reg_id: uint8_t {
     _rip, _rsp, _rflag, _rbp,
