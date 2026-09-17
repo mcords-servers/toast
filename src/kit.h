@@ -17,13 +17,18 @@
 
 typedef union reg {
     uint64_t i;
-    double f;
+    uint32_t u32;
+    uint16_t u16;
+    uint8_t  u8;
+
+    double   f;
+    float    f32;
 } reg_t;
+#define _registries (4+16+8)
 typedef struct env {
     uint8_t* bytecode;
     uint8_t stack[1024];
     // rip, rsp, rflag, rbp
-    #define _registries (4+32)
     reg_t regs[_registries];
 } env_t;
 enum byte_code: uint8_t {
@@ -34,12 +39,35 @@ enum byte_code: uint8_t {
     _jmp, _jif, _jnif,
     _mov, _sys,
     _fetch, _store, _const,
-    // _const reg u64
 };
 enum reg_id: uint8_t {
     _rip, _rsp, _rflag, _rbp,
-    _i0, _i1, _i2, _i3, _i4, _i5, _i6, _i7, _i8, _i9, _i10, _i11, _i12, _i13, _i14, _i15, _i16,
-    _f0, _f1, _f2, _f3, _f4, _f5, _f6, _f7, _f8, _f9, _f10, _f11, _f12, _f13, _f14, _f15, _f16,
+    // sizes are either 8 (default), 4, 2, 1 so it's 4 different options that take 2 bits in total
+    // maybe just MAYBE i'll add the 128 bit registries or smth
+    _i0,  _i0_4,  _i0_2,  _i0_1,
+    _i1,  _i1_4,  _i1_2,  _i1_1,
+    _i2,  _i2_4,  _i2_2,  _i2_1,
+    _i3,  _i3_4,  _i3_2,  _i3_1,
+    _i4,  _i4_4,  _i4_2,  _i4_1,
+    _i5,  _i5_4,  _i5_2,  _i5_1,
+    _i6,  _i6_4,  _i6_2,  _i6_1,
+    _i7,  _i7_4,  _i7_2,  _i7_1,
+    _i8,  _i8_4,  _i8_2,  _i8_1,
+    _i9,  _i9_4,  _i9_2,  _i9_1,
+    _i10, _i10_4, _i10_2, _i10_1,
+    _i11, _i11_4, _i11_2, _i11_1,
+    _i12, _i12_4, _i12_2, _i12_1,
+    _i13, _i13_4, _i13_2, _i13_1,
+    _i14, _i14_4, _i14_2, _i14_1,
+    _i15, _i15_4, _i15_2, _i15_1,
+    _f0,  _f0_4,
+    _f1,  _f1_4,
+    _f2,  _f2_4,
+    _f3,  _f3_4,
+    _f4,  _f4_4,
+    _f5,  _f5_4,
+    _f6,  _f6_4,
+    _f7,  _f7_4,
 };
 enum tok_type {
     unexpected_tok, eof_tok,

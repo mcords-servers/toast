@@ -4,6 +4,13 @@
 
 env_t env;
 
+uint8_t reg_size(enum reg_id reg) {
+    if (reg<=_rbp) return 8;
+    if (reg<_f0) return 1<<(3-(reg%4));
+    if (reg<_f7_4) return 4*(2-(reg%2));
+    return 0;
+}
+
 int bytecode_run(env_t* env) {
     if (!env||!env->bytecode) return 1;
     uint8_t* bc = env->bytecode;
@@ -15,82 +22,151 @@ int bytecode_run(env_t* env) {
         switch (bc[ip[0]]) {
             case _noop: continue;
             case _const: {
-                if (len<9||ptr[0]>_registries) return 2;
+                if (len<9||reg_size(ptr[0])<8) return 2;
                 memcpy(&env->regs[ptr[0]], ptr+1, 8);
                 ip[0] += 9;
                 break;
             }
             case _mov: {
-                if (len<2||ptr[0]>_registries||ptr[1]>_registries) return 2;
+                if (len<2||!reg_size(ptr[0])||!reg_size(ptr[1])) return 2;
                 memcpy(&env->regs[ptr[0]], &env->regs[ptr[1]], 8);
                 ip[0] += 2;
                 break;
             }
             case _add: {
-                if (len<2||ptr[0]>_registries||ptr[1]>_registries) return 2;
-                env->regs[ptr[0]].i += env->regs[ptr[1]].i;
+                if (len<2||!reg_size(ptr[0])||reg_size(ptr[0])!=reg_size(ptr[1])) return 2;
+                switch (reg_size(ptr[0])) {
+                    case 1: env->regs[ptr[0]].u8 += env->regs[ptr[1]].u8; break;
+                    case 2: env->regs[ptr[0]].u16 += env->regs[ptr[1]].u16; break;
+                    case 4: env->regs[ptr[0]].u32 += env->regs[ptr[1]].u32; break;
+                    case 8: env->regs[ptr[0]].i += env->regs[ptr[1]].i; break;
+                }
                 ip[0] += 2;
                 break;
             }
             case _sub: {
-                if (len<2||ptr[0]>_registries||ptr[1]>_registries) return 2;
-                env->regs[ptr[0]].i -= env->regs[ptr[1]].i;
+                if (len<2||!reg_size(ptr[0])||reg_size(ptr[0])!=reg_size(ptr[1])) return 2;
+                switch (reg_size(ptr[0])) {
+                    case 1: env->regs[ptr[0]].u8 -= env->regs[ptr[1]].u8; break;
+                    case 2: env->regs[ptr[0]].u16 -= env->regs[ptr[1]].u16; break;
+                    case 4: env->regs[ptr[0]].u32 -= env->regs[ptr[1]].u32; break;
+                    case 8: env->regs[ptr[0]].i -= env->regs[ptr[1]].i; break;
+                }
                 ip[0] += 2;
                 break;
             }
             case _mul: {
-                if (len<2||ptr[0]>_registries||ptr[1]>_registries) return 2;
-                env->regs[ptr[0]].i *= env->regs[ptr[1]].i;
+                if (len<2||!reg_size(ptr[0])||reg_size(ptr[0])!=reg_size(ptr[1])) return 2;
+                switch (reg_size(ptr[0])) {
+                    case 1: env->regs[ptr[0]].u8 *= env->regs[ptr[1]].u8; break;
+                    case 2: env->regs[ptr[0]].u16 *= env->regs[ptr[1]].u16; break;
+                    case 4: env->regs[ptr[0]].u32 *= env->regs[ptr[1]].u32; break;
+                    case 8: env->regs[ptr[0]].i *= env->regs[ptr[1]].i; break;
+                }
                 ip[0] += 2;
                 break;
             }
             case _div: {
-                if (len<2||ptr[0]>_registries||ptr[1]>_registries) return 2;
-                if (!env->regs[ptr[1]].i) return 3;
-                env->regs[ptr[0]].i /= env->regs[ptr[1]].i;
+                if (len<2||!reg_size(ptr[0])||reg_size(ptr[0])!=reg_size(ptr[1])) return 2;
+                switch (reg_size(ptr[0])) {
+                    case 1:
+                        if (!env->regs[ptr[1]].u8) return 3;
+                        env->regs[ptr[0]].u8 /= env->regs[ptr[1]].u8; break;
+                    case 2: 
+                        if (!env->regs[ptr[1]].u16) return 3;
+                        env->regs[ptr[0]].u16 /= env->regs[ptr[1]].u16; break;
+                    case 4: 
+                        if (!env->regs[ptr[1]].u32) return 3;
+                        env->regs[ptr[0]].u32 /= env->regs[ptr[1]].u32; break;
+                    case 8: 
+                        if (!env->regs[ptr[1]].i) return 3;
+                        env->regs[ptr[0]].i /= env->regs[ptr[1]].i; break;
+                }
                 ip[0] += 2;
                 break;
             }
             case _mod: {
-                if (len<2||ptr[0]>_registries||ptr[1]>_registries) return 2;
-                if (!env->regs[ptr[1]].i) return 3;
-                env->regs[ptr[0]].i %= env->regs[ptr[1]].i;
+                if (len<2||!reg_size(ptr[0])||reg_size(ptr[0])!=reg_size(ptr[1])) return 2;
+                switch (reg_size(ptr[0])) {
+                    case 1: 
+                        if (!env->regs[ptr[1]].u8) return 3;
+                        env->regs[ptr[0]].u8 %= env->regs[ptr[1]].u8; break;
+                    case 2: 
+                        if (!env->regs[ptr[1]].u16) return 3;
+                        env->regs[ptr[0]].u16 %= env->regs[ptr[1]].u16; break;
+                    case 4: 
+                        if (!env->regs[ptr[1]].u32) return 3;
+                        env->regs[ptr[0]].u32 %= env->regs[ptr[1]].u32; break;
+                    case 8: 
+                        if (!env->regs[ptr[1]].i) return 3;
+                        env->regs[ptr[0]].i %= env->regs[ptr[1]].i; break;
+                }
                 ip[0] += 2;
                 break;
             }
             case _and: {
-                if (len<2||ptr[0]>_registries||ptr[1]>_registries) return 2;
-                env->regs[ptr[0]].i &= env->regs[ptr[1]].i;
+                if (len<2||!reg_size(ptr[0])||reg_size(ptr[0])!=reg_size(ptr[1])) return 2;
+                switch (reg_size(ptr[0])) {
+                    case 1: env->regs[ptr[0]].u8 &= env->regs[ptr[1]].u8; break;
+                    case 2: env->regs[ptr[0]].u16 &= env->regs[ptr[1]].u16; break;
+                    case 4: env->regs[ptr[0]].u32 &= env->regs[ptr[1]].u32; break;
+                    case 8: env->regs[ptr[0]].i &= env->regs[ptr[1]].i; break;
+                }
                 ip[0] += 2;
                 break;
             }
             case _or: {
-                if (len<2||ptr[0]>_registries||ptr[1]>_registries) return 2;
-                env->regs[ptr[0]].i |= env->regs[ptr[1]].i;
+                if (len<2||!reg_size(ptr[0])||reg_size(ptr[0])!=reg_size(ptr[1])) return 2;
+                switch (reg_size(ptr[0])) {
+                    case 1: env->regs[ptr[0]].u8 |= env->regs[ptr[1]].u8; break;
+                    case 2: env->regs[ptr[0]].u16 |= env->regs[ptr[1]].u16; break;
+                    case 4: env->regs[ptr[0]].u32 |= env->regs[ptr[1]].u32; break;
+                    case 8: env->regs[ptr[0]].i |= env->regs[ptr[1]].i; break;
+                }
                 ip[0] += 2;
                 break;
             }
             case _xor: {
-                if (len<2||ptr[0]>_registries||ptr[1]>_registries) return 2;
-                env->regs[ptr[0]].i ^= env->regs[ptr[1]].i;
+                if (len<2||!reg_size(ptr[0])||reg_size(ptr[0])!=reg_size(ptr[1])) return 2;
+                switch (reg_size(ptr[0])) {
+                    case 1: env->regs[ptr[0]].u8 ^= env->regs[ptr[1]].u8; break;
+                    case 2: env->regs[ptr[0]].u16 ^= env->regs[ptr[1]].u16; break;
+                    case 4: env->regs[ptr[0]].u32 ^= env->regs[ptr[1]].u32; break;
+                    case 8: env->regs[ptr[0]].i ^= env->regs[ptr[1]].i; break;
+                }
                 ip[0] += 2;
                 break;
             }
             case _not: {
-                if (len<1||ptr[0]>_registries) return 2;
-                env->regs[ptr[0]].i = ~env->regs[ptr[0]].i;
+                if (len<1||!reg_size(ptr[0])) return 2;
+                switch (reg_size(ptr[0])) {
+                    case 1: env->regs[ptr[0]].u8 = ~env->regs[ptr[0]].u8; break;
+                    case 2: env->regs[ptr[0]].u16 = ~env->regs[ptr[0]].u16; break;
+                    case 4: env->regs[ptr[0]].u32 = ~env->regs[ptr[0]].u32; break;
+                    case 8: env->regs[ptr[0]].i = ~env->regs[ptr[0]].i; break;
+                }
                 ip[0] += 1;
                 break;
             }
             case _shL: {
-                if (len<2||ptr[0]>_registries||ptr[1]>_registries) return 2;
-                env->regs[ptr[0]].i <<= env->regs[ptr[1]].i;
+                if (len<2||!reg_size(ptr[0])||!reg_size(ptr[1])) return 2;
+                switch (reg_size(ptr[0])) {
+                    case 1: env->regs[ptr[0]].u8 <<= env->regs[ptr[1]].u8; break;
+                    case 2: env->regs[ptr[0]].u16 <<= env->regs[ptr[1]].u8; break;
+                    case 4: env->regs[ptr[0]].u32 <<= env->regs[ptr[1]].u8; break;
+                    case 8: env->regs[ptr[0]].i <<= env->regs[ptr[1]].u8; break;
+                }
                 ip[0] += 2;
                 break;
             }
             case _shR: {
-                if (len<2||ptr[0]>_registries||ptr[1]>_registries) return 2;
-                env->regs[ptr[0]].i >>= env->regs[ptr[1]].i;
+                if (len<2||!reg_size(ptr[0])||!reg_size(ptr[1])) return 2;
+                switch (reg_size(ptr[0])) {
+                    case 1: env->regs[ptr[0]].u8 >>= env->regs[ptr[1]].u8; break;
+                    case 2: env->regs[ptr[0]].u16 >>= env->regs[ptr[1]].u8; break;
+                    case 4: env->regs[ptr[0]].u32 >>= env->regs[ptr[1]].u8; break;
+                    case 8: env->regs[ptr[0]].i >>= env->regs[ptr[1]].u8; break;
+                }
                 ip[0] += 2;
                 break;
             }
