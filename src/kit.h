@@ -118,6 +118,7 @@ size_t index_append(void*** arr, void* ptr);
 size_t index_remove(void*** arr, size_t index);
 size_t index_ptr(void*** arr, void* ptr);
 size_t bytes_append(uint8_t** dest, uint8_t* src, size_t n);
+void* allocpy(void* val, size_t size);
 
 file_t* open_file(char* path);
 

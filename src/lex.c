@@ -36,7 +36,7 @@ bool lex_identifier(file_t* file) {
 bool lex_string(file_t* file) {
     if (!lex_spaces(file)) return 0;
     char* ptr = file->ptr;
-    if (*ptr=='=') {
+    if (*ptr=='\"') {
 
     }
     return 0;
@@ -48,18 +48,45 @@ bool lex_func(file_t* file) {
     return 1;
 }
 
+bool lex_char(file_t* file, char ch) {
+    if (!lex_spaces(file)||file->ptr[0]!=ch) return 0;
+    file->ptr++;
+    return 1;
+}
+
+bool lex_expresion(file_t* file);
 bool lex_postfix(file_t* file) {
     tok_t parent = file->tok;
-    char* ptr = file->ptr;
-    while (*ptr) {
-        if (!lex_spaces(file)) return 0;
-        
-                
+    char** ptr = &file->ptr;
+    while (**ptr) { // []().[].
+        if (lex_char(file, '[')) {
+            tok_t index = {0};
+            index.ptr=file->ptr;
+            index.len=1;
+            index.type=index_tok;
+            file->tok = index;
+            if (!lex_expresion(file)) return 0;
+            if (!lex_char(file, ']')) return 0;
+            //TODO: Finish
+            tok_t* expr = allocpy(&index, sizeof(tok_t));
+            index_append((void***)&parent.tokens, expr);
+            continue;
+        } if (lex_char(file, '(')) {
+            while (**ptr) {
+                if (!lex_expresion(file)) return 0;
+                if (!lex_char(file, ',')&&!lex_char(file, ')')) return 0;
+            }
+            continue;
+        } if (!lex_char(file, '.')) { // lex path smth
+            
+        }
     }
     return 1;
 }
 
 bool lex_value(file_t* file) {
+    tok_t parent = file->tok;
+    if (!lex_spaces(file)) return 0;
     char* ptr = file->ptr;
     if ((ptr[0]=='+'||ptr[0]=='-')&&ptr[0]==ptr[1]) { // ++arr, --arr
         if (!lex_identifier(file)) return 0;
@@ -74,6 +101,7 @@ bool lex_value(file_t* file) {
 }
 
 bool lex_expresion(file_t* file) {
+    tok_t parent = file->tok;
     if (!lex_value(file)) return 0;
 
     return 1;

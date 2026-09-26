@@ -65,6 +65,15 @@ size_t bytes_append(uint8_t** dest, uint8_t* src, size_t n) {
 }
 
 #undef arr
+
+void* allocpy(void* val, size_t size) {
+    if (!val||!size) return NULL;
+    void* ptr = malloc(size);
+    if (!ptr) return NULL;
+    memcpy(ptr, val, size);
+    return ptr;
+}
+
 #if 0
 __attribute__((constructor))
 static void test() {
