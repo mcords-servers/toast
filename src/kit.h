@@ -86,40 +86,11 @@ enum reg_id: uint8_t {
     _f6,  _f6_4,
     _f7,  _f7_4,
 };
-enum tok_type {
-    unexpected_tok, eof_tok,
-    identifier_tok, array_tok, string_tok,
-    index_tok, call_tok, child_tok,
-
-    max_tok
-};
-typedef struct tok tok_t;
-typedef struct tok {
-    char* ptr;
-    size_t len;
-    enum tok_type type;
-    tok_t** tokens;
-    struct {
-        bool present;
-        bool plus_minus;
-        bool pre_post;
-    } unary;
-    bool postfix;
-} tok_t;
-typedef struct stack_frame {
-    char* name;
-    enum tok_type type;
-    tok_t* tok;
-} stack_t;
-typedef struct file {size_t flen; char* buf; char* ptr; tok_t tok;} file_t;
-typedef struct proj {file_t** files; stack_t** frames;} proj_t;
 
 size_t index_append(void*** arr, void* ptr);
 size_t index_remove(void*** arr, size_t index);
 size_t index_ptr(void*** arr, void* ptr);
 size_t bytes_append(uint8_t** dest, uint8_t* src, size_t n);
 void* allocpy(void* val, size_t size);
-
-file_t* open_file(char* path);
 
 #endif
