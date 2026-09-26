@@ -1,6 +1,7 @@
 #include "kit.h"
 
 // Idk why i did this file, maybe i'll need it sometime later
+// TODO: Finish this bullshit or reduce it to atoms
 
 env_t env;
 
