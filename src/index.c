@@ -36,6 +36,27 @@ size_t index_remove(void*** arr, size_t index) {
 }
 
 #undef arr
+void* index_pop(void*** arr) {
+    if (!arr||!*arr) return NULL;
+    #define arr (*arr)
+    size_t top = (size_t)arr[1];
+    if (!top--) return NULL;
+    void* ptr = arr[top+2];
+    arr[top+2] = NULL;
+    arr[1] = (void*)top;
+    return ptr;
+}
+
+#undef arr
+void* index_top(void*** arr) {
+    if (!arr||!*arr) return NULL;
+    #define arr (*arr)
+    size_t top = (size_t)arr[1];
+    if (!top--) return NULL;
+    return arr[top+2];
+}
+
+#undef arr
 size_t index_ptr(void*** arr, void* ptr) {
     if (!arr||!*arr) return 0;
     #define arr (*arr)

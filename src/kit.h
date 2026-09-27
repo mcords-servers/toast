@@ -1,6 +1,7 @@
 #ifndef KIT_H
 #define KIT_H
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <malloc.h>
 #include <stdint.h>
@@ -9,8 +10,10 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include <string.h>
+#include <stdlib.h>
 
-#include <bytecode/bytecode.h>
+#include "bytecode/bytecode.h"
+#include "structs.h"
 
 #define LOG(fmt, ...) printf("[%s:%d] " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__)
 #define DEBUG(x) _Generic((x), short: LOG(#x ": %hd", (x)), unsigned short: LOG(#x ": %hu", (x)), int: LOG(#x ": %d", (x)), unsigned int: LOG(#x ": %u", (x)), long: LOG(#x ": %ld", (x)), unsigned long: LOG(#x ": %lu", (x)), long long: LOG(#x ": %lld", (x)), unsigned long long: LOG(#x ": %llu", (x)), float: LOG(#x ": %f", (x)), double: LOG(#x ": %lf", (x)), char: LOG(#x ": '%c'", (x)), char *: LOG(#x ": \"%s\"", (x)), const char *: LOG(#x ": \"%s\"", (x)), void *: LOG(#x ": %p", (x)), void **: LOG(#x ": %p", (x)) )
@@ -22,5 +25,9 @@ size_t index_remove(void*** arr, size_t index);
 size_t index_ptr(void*** arr, void* ptr);
 size_t bytes_append(uint8_t** dest, uint8_t* src, size_t n);
 void* allocpy(void* val, size_t size);
+void* index_pop(void*** arr);
+void* index_top(void*** arr);
+
+proj_t* new_project(char* filename);
 
 #endif
