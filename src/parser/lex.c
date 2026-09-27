@@ -13,6 +13,7 @@ loop:
     return true;
 }
 
-bool lex_statement(proj_t* proj) {
+tok_t* lex_statement(proj_t* proj) {
 
+    return NULL;
 }
