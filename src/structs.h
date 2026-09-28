@@ -15,9 +15,11 @@ typedef struct file {
 
 typedef struct token {
     size_t len;
+    char* ptr;
+
     file_t* file;
     enum : uint64_t {
-        func_holder,
+        func_holder, identifier_tok,
     } type;
     tok_t** tokens;
 } tok_t;

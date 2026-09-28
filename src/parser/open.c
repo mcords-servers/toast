@@ -27,6 +27,8 @@ file_t* open_file(proj_t* proj, char* filename) {
 proj_t* new_project(char* filename) {
     proj_t* proj = calloc(1, sizeof(proj_t));
     file_t* main = open_file(proj, filename);
+
+    lex_statement(proj);
     
     return proj;
 }

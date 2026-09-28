@@ -19,6 +19,7 @@
 #define DEBUG(x) _Generic((x), short: LOG(#x ": %hd", (x)), unsigned short: LOG(#x ": %hu", (x)), int: LOG(#x ": %d", (x)), unsigned int: LOG(#x ": %u", (x)), long: LOG(#x ": %ld", (x)), unsigned long: LOG(#x ": %lu", (x)), long long: LOG(#x ": %lld", (x)), unsigned long long: LOG(#x ": %llu", (x)), float: LOG(#x ": %f", (x)), double: LOG(#x ": %lf", (x)), char: LOG(#x ": '%c'", (x)), char *: LOG(#x ": \"%s\"", (x)), const char *: LOG(#x ": \"%s\"", (x)), void *: LOG(#x ": %p", (x)), void **: LOG(#x ": %p", (x)) )
 #define u64(x) ((uint64_t)(x))&0xFF, (((uint64_t)(x))>>8)&0xFF, (((uint64_t)(x))>>16)&0xFF, (((uint64_t)(x))>>24)&0xFF, (((uint64_t)(x))>>32)&0xFF, (((uint64_t)(x))>>40)&0xFF, (((uint64_t)(x))>>48)&0xFF, (((uint64_t)(x))>>56)&0xFF
 #define u32(x) (x)&0xFF, ((x)>>8)&0xFF, ((x)>>16)&0xFF, ((x)>>24)&0xFF
+#define s8(b) ((uint64_t)(b)[0]|(uint64_t)(b)[1]<<8|(uint64_t)(b)[2]<<16|(uint64_t)(b)[3]<<24|(uint64_t)(b)[4]<<32|(uint64_t)(b)[5]<<40|(uint64_t)(b)[6]<<48|(uint64_t)(b)[7]<<56)
 
 size_t index_append(void*** arr, void* ptr);
 size_t index_remove(void*** arr, size_t index);
@@ -27,7 +28,9 @@ size_t bytes_append(uint8_t** dest, uint8_t* src, size_t n);
 void* allocpy(void* val, size_t size);
 void* index_pop(void*** arr);
 void* index_top(void*** arr);
+void print_bits(uint64_t v);
 
 proj_t* new_project(char* filename);
+tok_t* lex_statement(proj_t* proj);
 
 #endif
