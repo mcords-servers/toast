@@ -19,16 +19,32 @@ file_t* open_file(proj_t* proj, char* filename) {
     index_append((void***)&proj->files, file);
     index_append((void***)&proj->files_stack, file);
 
-    
+    tok_t* statement;
+    while ((statement = lex_statement(proj))) {
+        index_append((void***)&file->globals, statement);
+    }
 
     return file;
 }
 
+inline file_t* top_file(proj_t* proj) {
+    return index_top((void***)&proj->files_stack);
+}
+
 proj_t* new_project(char* filename) {
     proj_t* proj = calloc(1, sizeof(proj_t));
+    proj->path = getcwd(NULL, 0);
+
     file_t* main = open_file(proj, filename);
 
-    lex_statement(proj);
+    tok_t** globals = main->globals, *tok;
+    size_t i = globals?(size_t)globals[0]+1:0;
+    for (; i; i--) {
+        // DEBUG(i);
+        tok = globals[i+1];
+        if (tok->type!=func_holder) continue;
+        LOG("function observed");
+    }
     
     return proj;
 }
