@@ -19,7 +19,9 @@ typedef struct token {
 
     file_t* file;
     enum : uint64_t {
-        func_holder, identifier_tok,
+        identifier_tok, func_tok, if_tok,
+        else_tok, elif_tok, return_tok, break_tok,
+        task_tok, while_tok, for_tok, class_tok, enum_tok,
     } type;
     tok_t** tokens;
 } tok_t;

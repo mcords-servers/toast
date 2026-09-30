@@ -26,9 +26,23 @@ tok_t* lex_identifier(proj_t* proj) {
     if (tok.len<=8) {
         size_t val = 0;
         memcpy(&val, tok.ptr, tok.len);
-        if (val==s8("func")) print_bits(val);
-                
+        if (val==s8("func")) tok.type = func_tok;
+        if (val==s8("if")) tok.type = if_tok;
+        if (val==s8("else")) tok.type = else_tok;
+        if (val==s8("elif")) tok.type = elif_tok;
+        if (val==s8("return")) tok.type = return_tok;
+        if (val==s8("break")) tok.type = break_tok;
+        if (val==s8("task")) tok.type = task_tok;
+        if (val==s8("while")) tok.type = while_tok;
+        if (val==s8("for")) tok.type = for_tok;
+        if (val==s8("class")) tok.type = class_tok;
+        if (val==s8("enum")) tok.type = enum_tok;
 
+        if (tok.len<=3&&(val&0xFF==s8("u")||val&0xFF==s8("u"))) {
+            size_t num = (val&0xFFFFFF)>>8;
+            DEBUG(num);
+
+        }
     }
 
     return allocpy(&tok, sizeof(tok_t));
