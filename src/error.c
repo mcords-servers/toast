@@ -23,7 +23,7 @@ void* error(proj_t* proj, const char* format, ...) {
 
     // Position of token in the file
     const char* tok = proj->last_tok->ptr;
-    size_t tok_len = proj->last_tok->len;
+    size_t tok_len = proj->last_tok->len?:1;
 
     // Calculate line and column (1-based)
     size_t line = 1;
