@@ -13,7 +13,12 @@ loop:
     return true;
 }
 
-tok_t* lex_previous(proj_t* proj) {
-    proj->last_tok->file->ptr = proj->last_tok->ptr;
+tok_t lex_previous(proj_t* proj) {
+    proj->last_tok.file->ptr = proj->last_tok.ptr;
     return proj->last_tok;
+}
+
+tok_t* tokdup(proj_t* proj, tok_t* tok) {
+    proj->last_tok=tok[0];
+    return allocpy(tok, sizeof(tok_t));
 }

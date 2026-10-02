@@ -5,7 +5,11 @@ tok_t* lex_identifier(proj_t* proj) {
     tok_t tok = {0};
     tok.file = top_file(proj);
     tok.ptr = tok.file->ptr;
-    if (!isalpha(tok.file->ptr[0])&&tok.file->ptr[0]!='_') return NULL;
+    if (!isalpha(tok.file->ptr[0])&&tok.file->ptr[0]!='_') {
+        if (proj->optional_tok) return NULL;
+        proj->last_tok=tok;
+        return error(proj, "identifier was expected");
+    }
     while (isalnum(tok.file->ptr[0])||tok.file->ptr[0]=='_') tok.file->ptr++;
     tok.len = tok.file->ptr-tok.ptr;
     tok.type = identifier_tok;
@@ -42,5 +46,5 @@ tok_t* lex_identifier(proj_t* proj) {
         }
     }
 
-    return (proj->last_tok=allocpy(&tok, sizeof(tok_t)));
+    return tokdup(proj, &tok);
 }

@@ -11,6 +11,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
+#include <setjmp.h>
 
 #include "bytecode/bytecode.h"
 #include "structs.h"
@@ -34,6 +35,7 @@ void print_bits(uint64_t v);
 proj_t* new_project(char* filename);
 tok_t* lex_statement(proj_t* proj);
 file_t* top_file(proj_t* proj);
+tok_t* tokdup(proj_t* proj, tok_t* tok);
 
 void* error(proj_t* proj, const char* format, ...);
 

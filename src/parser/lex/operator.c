@@ -16,11 +16,12 @@ tok_t* lex_operator(proj_t* proj) {
         case ';': tok.type=semicolon; break;
 
         default:
-            (proj->last_tok=allocpy(&tok, sizeof(tok_t)));
+            if (proj->optional_tok) return NULL;
+            tokdup(proj, &tok);
             return error(proj, "unexpected operator");
     }
 
     tok.file->ptr++;
 
-    return (proj->last_tok=allocpy(&tok, sizeof(tok_t)));
+    return tokdup(proj, &tok);
 }

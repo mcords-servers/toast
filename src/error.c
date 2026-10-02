@@ -11,7 +11,7 @@ void* error(proj_t* proj, const char* format, ...) {
     va_list args;
     va_start(args, format);
 
-    file_t* file = proj->last_tok->file;
+    file_t* file = proj->last_tok.file;
     const char* path = file->path;
 
     if (proj->path && strncmp(path, proj->path, strlen(proj->path)) == 0) {
@@ -22,8 +22,8 @@ void* error(proj_t* proj, const char* format, ...) {
     }
 
     // Position of token in the file
-    const char* tok = proj->last_tok->ptr;
-    size_t tok_len = proj->last_tok->len?:1;
+    const char* tok = proj->last_tok.ptr;
+    size_t tok_len = proj->last_tok.len?:1;
 
     // Calculate line and column (1-based)
     size_t line = 1;
@@ -185,5 +185,8 @@ void* error(proj_t* proj, const char* format, ...) {
     fprintf(stdout, "\033[0m\n");
 
     va_end(args);
+
+    longjmp(proj->jump_buffer, 1);
+
     return NULL;
 }

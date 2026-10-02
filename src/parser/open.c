@@ -35,6 +35,10 @@ proj_t* new_project(char* filename) {
     proj_t* proj = calloc(1, sizeof(proj_t));
     proj->path = getcwd(NULL, 0);
 
+    if (setjmp(proj->jump_buffer)) { // Do on error
+        
+        return proj;
+    }
     file_t* main = open_file(proj, filename);
 
     tok_t** globals = main->globals, *tok;

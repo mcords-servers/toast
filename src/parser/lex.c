@@ -15,17 +15,18 @@ tok_t* lex_statement(proj_t* proj) {
         statement.type = func_holder;
         index_append((void***)&statement.tokens, tok);
 
-        tok_t* paren = lex_operator(proj);
-        if (!paren) return error(proj, "operator was expected");
-        if (paren->type==parentheses_open) {
+        tok = lex_operator(proj);
+        // func id
+        if (!tok) return error(proj, "operator was expected");
+        if (tok->type==parentheses_open) {
             
         }
-        free(paren);
+        free(tok);
         
         break;
     
     default:
         break;
     }
-    return (proj->last_tok=allocpy(&statement, sizeof(tok_t)));
+    return tokdup(proj, &statement);
 }

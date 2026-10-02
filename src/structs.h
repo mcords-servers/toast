@@ -25,6 +25,7 @@ typedef struct token {
         task_tok, while_tok, for_tok, class_tok, enum_tok,
         type_tok, float_tok, double_tok, int_tok, long_tok, ulong_tok, uint_tok,
             curly_open, curly_close, parentheses_open, parentheses_close, semicolon,
+        declaration_holer,
     } type;
     tok_t** tokens;
 } tok_t;
@@ -37,7 +38,10 @@ typedef struct project {
     tok_t**  globals;
 
     tok_t*   main_func;
-    tok_t*   last_tok;
+    tok_t    last_tok;
+
+    bool     optional_tok;
+    jmp_buf  jump_buffer;
 } proj_t;
 
 #endif
